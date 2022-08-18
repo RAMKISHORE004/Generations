@@ -1,0 +1,326 @@
+<html>
+<head>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/vis-network@latest/styles/vis-network.css" type="text/css" />
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vis-network@latest/dist/vis-network.min.js"> </script>
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+
+<style type="text/css">
+
+        #mynetwork {
+            width: 100%;
+            height: 100%;
+            background-color: #ffffff;
+            border: 1px solid lightgray;
+            position: relative;
+            float: left;
+        }
+
+        
+        #loadingBar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width: 100%;
+            height: 100%;
+            background-color:rgba(200,200,200,0.8);
+            -webkit-transition: all 0.5s ease;
+            -moz-transition: all 0.5s ease;
+            -ms-transition: all 0.5s ease;
+            -o-transition: all 0.5s ease;
+            transition: all 0.5s ease;
+            opacity:1;
+        }
+
+        #bar {
+            position:absolute;
+            top:0px;
+            left:0px;
+            width:20px;
+            height:20px;
+            margin:auto auto auto auto;
+            border-radius:11px;
+            border:2px solid rgba(30,30,30,0.05);
+            background: rgb(0, 173, 246); /* Old browsers */
+            box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+        }
+
+        #border {
+            position:absolute;
+            top:10px;
+            left:10px;
+            width:500px;
+            height:23px;
+            margin:auto auto auto auto;
+            box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+            border-radius:10px;
+        }
+
+        #text {
+            position:absolute;
+            top:8px;
+            left:530px;
+            width:30px;
+            height:50px;
+            margin:auto auto auto auto;
+            font-size:22px;
+            color: #000000;
+        }
+
+        div.outerBorder {
+            position:relative;
+            top:400px;
+            width:600px;
+            height:44px;
+            margin:auto auto auto auto;
+            border:8px solid rgba(0,0,0,0.1);
+            background: rgb(252,252,252); /* Old browsers */
+            background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+            background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+            background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+            background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+            background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+            background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+            filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+            border-radius:72px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+        }
+        
+
+        
+
+        
+        /* position absolute is important and the container has to be relative or absolute as well. */
+	    div.popup {
+            position:absolute;
+            top:0px;
+            left:0px;
+            display:none;
+            background-color:#f5f4ed;
+            -moz-border-radius: 3px;
+            -webkit-border-radius: 3px;
+            border-radius: 3px;
+            border: 1px solid #808074;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+	    }
+
+	    /* hide the original tooltip */
+	    .vis-network-tooltip {
+	      display:none;
+	    }
+        
+</style>
+
+</head>
+
+<body>
+<div id = "mynetwork"></div>
+
+<div id="loadingBar">
+    <div class="outerBorder">
+        <div id="text">0%</div>
+        <div id="border">
+            <div id="bar"></div>
+        </div>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+
+    // initialize global variables.
+    var edges;
+    var nodes;
+    var network; 
+    var container;
+    var options, data;
+
+    
+    // This method is responsible for drawing the graph, returns the drawn network
+    function drawGraph() {
+        var container = document.getElementById('mynetwork');
+        
+        
+
+        // parsing and collecting nodes and edges from the python
+        nodes = new vis.DataSet([{"color": "#0000FF", "id": "Xman", "label": "Xman", "physics": false, "shape": "dot", "title": "\u003ca href=\u0027#section1\u0027 class=\u0027btn\u0027\u003ehello\u003c/a\u003e"}, {"color": "#0000FF", "id": "XmanS", "label": "XmanS", "shape": "dot"}, {"color": "#0000FF", "id": "AX", "label": "Rayaji Rao", "shape": "dot"}, {"color": "#0000FF", "id": "AXman2", "label": "Laxmanji Rao", "shape": "dot"}, {"color": "#0000FF", "id": "AXman3", "label": "AXman3", "shape": "dot"}, {"color": "green", "id": "AXman4", "label": "AXman4", "shape": "dot"}, {"color": "cyan", "id": "AXman5", "label": "AXman5", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman2S", "label": "AXman2S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman21", "label": "Kishanji Rao", "shape": "dot"}, {"color": "#1414D7", "id": "AXman22", "label": "Narsoji", "shape": "dot"}, {"color": "#1414D7", "id": "AXman23", "label": "Mohanji", "shape": "dot"}, {"color": "yellow", "id": "AXman24", "label": "Shankarramma", "shape": "dot"}, {"color": "pink", "id": "AXman25", "label": "Nannemma", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman2", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman21S", "label": "AXman21S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman211", "label": "Gopal", "shape": "dot"}, {"color": "orange", "id": "AXman212", "label": "Sudharashana", "shape": "dot"}, {"color": "pink", "id": "AXman213", "label": "Kalavati", "shape": "dot"}, {"color": "yellow", "id": "AXman214", "label": "Vijaya", "shape": "dot"}, {"color": "green", "id": "AXman215", "label": "Shamala", "shape": "dot"}, {"color": "black", "id": "AXman216", "label": "Indira", "shape": "dot"}, {"color": "cyan", "id": "AXman217", "label": "padma", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman21", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman211S", "label": "Mira bhai", "shape": "dot"}, {"color": "#1414D7", "id": "AXman2111", "label": "Tilak", "shape": "dot"}, {"color": "#1414D7", "id": "AXman2112", "label": "Laxman", "shape": "dot"}, {"color": "yellow", "id": "AXman2113", "label": "Revati", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman211", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman22S", "label": "AXman22S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman221", "label": "AXman221", "shape": "dot"}, {"color": "#1414D7", "id": "AXman222", "label": "Babu", "shape": "dot"}, {"color": "orange", "id": "AXman223", "label": "Manjula", "shape": "dot"}, {"color": "yellow", "id": "AXman224", "label": "Munna", "shape": "dot"}, {"color": "green", "id": "AXman225", "label": "Roopa", "shape": "dot"}, {"color": "pink", "id": "AXman226", "label": "AXman226", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman22", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman23S", "label": "AXman23S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman231", "label": "Kiran", "shape": "dot"}, {"color": "#1414D7", "id": "AXman232", "label": "Gopi", "shape": "dot"}, {"color": "orange", "id": "AXman233", "label": "Rukmini", "shape": "dot"}, {"color": "pink", "id": "AXman234", "label": "Sunitha", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman23", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman3S", "label": "AXman3S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman31", "label": "Gangoji Rao", "shape": "dot"}, {"color": "yellow", "id": "AXman32", "label": "AXman32", "shape": "dot"}, {"color": "pink", "id": "AXman33", "label": "AXman33", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman3", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman31S", "label": "AXman31S", "shape": "dot"}, {"color": "#1414D7", "id": "AXman311", "label": "Hirlal", "shape": "dot"}, {"color": "#1414D7", "id": "AXman312", "label": "Karan", "shape": "dot"}, {"color": "#1414D7", "id": "AXman313", "label": "Srinu", "shape": "dot"}, {"color": "#1414D7", "id": "AXman314", "label": "AXman314", "shape": "dot"}, {"color": "#1414D7", "id": "AXman315", "label": "AXman315", "shape": "dot"}, {"color": "orange", "id": "AXman316", "label": "AXman316", "shape": "dot"}, {"color": "yellow", "id": "AXman317", "label": "AXman317", "shape": "dot"}, {"color": "pink", "id": "AXman318", "label": "AXman318", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman31", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman311S", "label": "Prema", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3111", "label": "AXman3111", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3112", "label": "AXman3112", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3113", "label": "AXman3113", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman311", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman312S", "label": "Lata", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3121", "label": "Pavan", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3122", "label": "AXman3122", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman312", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AXman313S", "label": "Sudha", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3131", "label": "Sushma", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3132", "label": "AXman3132", "shape": "dot"}, {"color": "#1414D7", "id": "AXman3133", "label": "Tagore", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAXman313", "label": "Waste", "shape": "dot"}, {"color": "#0000FF", "id": "AXS", "label": "Yenkamma", "shape": "dot"}, {"color": "#0000FF", "id": "A", "label": "Hanumanth Rao", "shape": "dot"}, {"color": "#0000FF", "id": "AX2", "label": "Ram chander Rao", "shape": "dot"}, {"color": "green", "id": "AX3", "label": "Pedda piramma", "shape": "dot"}, {"color": "cyan", "id": "AX4", "label": "Chinna piramma", "shape": "dot"}, {"color": "black", "id": "AX5", "label": "Radha bhai", "shape": "dot"}, {"color": "#D70000", "id": "AX6", "label": "Narsu bhai", "shape": "dot"}, {"color": "orange", "id": "AX7", "label": "Chandramma", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste1AX3", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste2AX3", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste3AX3", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste4AX3", "label": "Waste", "shape": "dot"}, {"color": "#0000FF", "group": "1", "id": "AX2S", "label": "AX2S", "shape": "dot"}, {"color": "#0000FF", "id": "AX21", "label": "Raghu", "shape": "dot"}, {"color": "#0000FF", "id": "AX22", "label": "Shamlal", "shape": "dot"}, {"color": "#0000FF", "id": "AX23", "label": "Shivaji", "shape": "dot"}, {"color": "#0000FF", "id": "AX24", "label": "Govind", "shape": "dot"}, {"color": "#0000FF", "id": "AX25", "label": "Prakash", "shape": "dot"}, {"color": "#0000FF", "id": "AX26", "label": "Madhu", "shape": "dot"}, {"color": "orange", "id": "AX27", "label": "Pramila bhai", "shape": "dot"}, {"color": "yellow", "id": "AX28", "label": "Saroja", "shape": "dot"}, {"color": "pink", "id": "AX29", "label": "Aruna", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX21S", "label": "Pramila", "shape": "dot"}, {"color": "#1414D7", "id": "AX211", "label": "AX211", "shape": "dot"}, {"color": "#1414D7", "id": "AX212", "label": "Sridhar", "shape": "dot"}, {"color": "orange", "id": "AX213", "label": "Baby", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX22S", "label": "Eshwari", "shape": "dot"}, {"color": "#1414D7", "id": "AX221", "label": "Santhosh", "shape": "dot"}, {"color": "yellow", "id": "AX222", "label": "Madhuri", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAX22", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX23S", "label": "Rajeswari", "shape": "dot"}, {"color": "#1414D7", "id": "AX231", "label": "Manoj", "shape": "dot"}, {"color": "green", "id": "AX232", "label": "Pinky", "shape": "dot"}, {"color": "#1414D7", "id": "AX233", "label": "Harsha", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX24S", "label": "AX24S", "shape": "dot"}, {"color": "#1414D7", "id": "AX241", "label": "Bittu", "shape": "dot"}, {"color": "#1414D7", "id": "AX242", "label": "Vishu", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAX24", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX25S", "label": "Radhika", "shape": "dot"}, {"color": "#1414D7", "id": "AX251", "label": "Sanni", "shape": "dot"}, {"color": "#1414D7", "id": "AX252", "label": "Adhi", "shape": "dot"}, {"color": "#1414D7", "id": "AX253", "label": "AX253", "shape": "dot"}, {"color": "#1414D7 ", "id": "AX26S", "label": "AX26S", "shape": "dot"}, {"color": "#1414D7", "id": "AX261", "label": "Banny", "shape": "dot"}, {"color": "#1414D7", "id": "AX262", "label": "AX262", "shape": "dot"}, {"color": "white", "hidden": false, "id": "WasteAX26", "label": "Waste", "shape": "dot"}, {"color": "#0000FF", "id": "AS", "label": "Era Bhai", "shape": "dot"}, {"color": "#0000FF", "id": "A1", "label": "Bhadu", "shape": "dot"}, {"color": "#0000FF", "id": "A2", "label": "Sai Baba", "shape": "dot"}, {"color": "green", "id": "A3", "label": "Shakuntala", "shape": "dot"}, {"color": "cyan", "id": "A4", "label": "Savitri", "shape": "dot"}, {"color": "black", "id": "A5", "label": "Manora", "shape": "dot"}, {"color": "#D70000", "id": "A6", "label": "Sharada", "shape": "dot"}, {"color": "orange", "id": "A7", "label": "Lakshmi", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste1", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste2", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste3", "label": "Waste", "shape": "dot"}, {"color": "white", "hidden": false, "id": "Waste4", "label": "Waste", "shape": "dot"}, {"color": "#1414D7 ", "id": "A2S", "label": "Maleswari", "shape": "dot"}, {"color": "#1414D7", "id": "A21", "label": "Arjun", "shape": "dot"}, {"color": "#1414D7", "id": "A22", "label": "Chandana", "shape": "dot"}, {"color": "#1414D7", "id": "A23", "label": "Chander", "shape": "dot"}, {"color": "orange", "id": "C", "label": "srinivasulu", "shape": "dot"}, {"color": "orange", "id": "A71", "label": "Lakshmi", "shape": "dot"}, {"color": "orange", "id": "C1", "label": "Swati", "shape": "dot"}, {"color": "orange", "id": "C2", "label": "Mani", "shape": "dot"}, {"color": "green", "id": "D", "label": "Narsoji Rao", "shape": "dot"}, {"color": "green", "id": "A31", "label": "shakuntala bhai", "shape": "dot"}, {"color": "#229D06", "id": "D1", "label": "Kishor", "shape": "dot"}, {"color": "green", "id": "D2", "label": "Satti", "shape": "dot"}, {"color": "#BD9BD9", "id": "D3", "label": "Rajini", "shape": "dot"}, {"color": "#C371D3", "id": "D4", "label": "Radhika", "shape": "dot"}, {"color": "#229D06", "id": "D1S", "label": "poornima", "shape": "dot"}, {"color": "#229D06", "id": "D11", "label": "kushi", "shape": "dot"}, {"color": "#229D06", "id": "D12", "label": "pari", "shape": "dot"}, {"color": "#BD9BD9", "id": "D3S", "label": "Ashok", "shape": "dot"}, {"color": "#C371D3", "id": "D4S", "label": "Kashim", "shape": "dot"}, {"color": "#C371D3", "id": "D41", "label": "Honey", "shape": "dot"}, {"color": "#C371D3", "id": "D42", "label": "mini", "shape": "dot"}, {"color": "black", "id": "E", "label": "Raja ram", "shape": "dot"}, {"color": "black", "id": "A51", "label": "manora", "shape": "dot"}, {"color": "black", "id": "E1", "label": "Ram prasad", "shape": "dot"}, {"color": "black", "id": "E2", "label": "Nagaraju", "shape": "dot"}, {"color": "#369CAC", "id": "E3", "label": "jyothi", "shape": "dot"}, {"color": "#342E2E", "id": "E1S", "label": "lata", "shape": "dot"}, {"color": "#342E2E", "id": "E11", "label": "atarava", "shape": "dot"}, {"color": "#342E2E", "id": "E12", "label": "akrut", "shape": "dot"}, {"color": "#3F3232", "id": "E2S", "label": "Durga", "shape": "dot"}, {"color": "#3F3232", "id": "E21", "label": "Adhya", "shape": "dot"}, {"color": "#3F3232", "id": "E22", "label": "E22", "shape": "dot"}, {"color": "#369CAC", "id": "E3S", "label": "Ramu", "shape": "dot"}, {"color": "#369CAC", "id": "E31", "label": "Kanni", "shape": "dot"}, {"color": "#369CAC", "id": "E32", "label": "chinni", "shape": "dot"}, {"color": "#FF0000", "id": "B", "label": "Narsoji", "shape": "dot"}, {"color": "#FF0000", "id": "BS", "label": "Balu Bhai", "shape": "dot"}, {"color": "#EB0000", "id": "B1", "label": "Niranjan", "shape": "dot"}, {"color": "#EB0000", "id": "B2", "label": "Nagender", "shape": "dot"}, {"color": "#EB0000", "id": "B3", "label": "Venkoji", "shape": "dot"}, {"color": "yellow", "id": "B4", "label": "Jamuna krishnaJi", "shape": "dot"}, {"color": "pink", "id": "B5", "label": "Antu Babu", "shape": "dot"}, {"color": "#C83232", "id": "B1S", "label": "Jamuna bhai", "shape": "dot"}, {"color": "#C83232", "id": "B11", "label": "Jamma", "shape": "dot"}, {"color": "#C83232", "id": "B12", "label": "Molali", "shape": "dot"}, {"color": "#2D9C91", "id": "B13", "label": "chitti", "shape": "dot"}, {"color": "#B44646", "id": "B11S", "label": "B11S", "shape": "dot"}, {"color": "#B44646", "id": "B111", "label": "B111", "shape": "dot"}, {"color": "#B44646", "id": "B112", "label": "B112", "shape": "dot"}, {"color": "#AA3232", "id": "B12S", "label": "B12S", "shape": "dot"}, {"color": "#AA3232", "id": "B121", "label": "B121", "shape": "dot"}, {"color": "#AA3232", "id": "B122", "label": "B122", "shape": "dot"}, {"color": "#AA3232", "id": "B123", "label": "B123", "shape": "dot"}, {"color": "#2D9C91", "id": "B13S", "label": "Hira Ji", "shape": "dot"}, {"color": "#2D9C91", "id": "B131", "label": "B131", "shape": "dot"}, {"color": "#2D9C91", "id": "B132", "label": "B132", "shape": "dot"}, {"color": "#2D9C91", "id": "B133", "label": "B133", "shape": "dot"}, {"color": "#EB1400", "id": "B2S", "label": "Rani bhai", "shape": "dot"}, {"color": "#EB1400", "id": "B21", "label": "Venu", "shape": "dot"}, {"color": "#EB1400", "id": "B22", "label": "Shiva", "shape": "dot"}, {"color": "#EB1400", "id": "B3S", "label": "Sharada", "shape": "dot"}, {"color": "#D70000", "id": "B31", "label": "Santhosh", "shape": "dot"}, {"color": "#D70000", "id": "B32", "label": "Ram", "shape": "dot"}, {"color": "#EB1414", "id": "B21S", "label": "Gayatri", "shape": "dot"}, {"color": "#EB1414", "id": "B211", "label": "Akshay", "shape": "dot"}, {"color": "#EB1414", "id": "B212", "label": "B212", "shape": "dot"}, {"color": "#EB1414", "id": "B213", "label": "Dikshita", "shape": "dot"}, {"color": "#EB1414", "id": "B22S", "label": "B22S", "shape": "dot"}, {"color": "#D72828", "id": "B221", "label": "B221", "shape": "dot"}, {"color": "#D72828", "id": "B222", "label": "B222", "shape": "dot"}, {"color": "#D72828", "id": "B223", "label": "B223", "shape": "dot"}, {"color": "#EB1400", "group": "1", "id": "XX", "label": "XX", "shape": "dot", "title": "hello"}, {"color": "#EB1400", "id": "XXS", "label": "XXS", "shape": "dot"}, {"color": "#EB1400", "id": "XX1", "label": "Pedda Nagoji", "shape": "dot"}, {"color": "#EB1400", "id": "XX2", "label": "Chinna Nogoji", "shape": "dot"}, {"color": "#EB1400", "id": "XX3", "label": "Hanumanth Rao", "shape": "dot"}, {"color": "#EB1400", "id": "XX4", "label": "Narsoji", "shape": "dot"}]);
+        edges = new vis.DataSet([{"arrows": "to", "from": "XmanS", "to": "Xman", "value": 2}, {"arrows": "to", "from": "Xman", "to": "AX"}, {"arrows": "to", "from": "Xman", "to": "AXman2"}, {"arrows": "to", "from": "Xman", "to": "AXman3"}, {"arrows": "to", "from": "Xman", "to": "AXman4"}, {"arrows": "to", "from": "Xman", "to": "AXman5"}, {"arrows": "to", "from": "AXman2", "to": "AXman2S", "value": 2}, {"arrows": "to", "from": "AXman2", "to": "AXman21"}, {"arrows": "to", "from": "AXman2", "to": "AXman22"}, {"arrows": "to", "from": "AXman2", "to": "AXman23"}, {"arrows": "to", "from": "AXman2", "to": "AXman24"}, {"arrows": "to", "from": "AXman2", "to": "AXman25"}, {"arrows": "to", "color": "white", "from": "AXman2", "hidden": false, "to": "WasteAXman2"}, {"arrows": "to", "from": "AXman21", "to": "AXman21S", "value": 2}, {"arrows": "to", "from": "AXman21", "to": "AXman211"}, {"arrows": "to", "from": "AXman21", "to": "AXman212"}, {"arrows": "to", "from": "AXman21", "to": "AXman213"}, {"arrows": "to", "from": "AXman21", "to": "AXman214"}, {"arrows": "to", "from": "AXman21", "to": "AXman215"}, {"arrows": "to", "from": "AXman21", "to": "AXman216"}, {"arrows": "to", "from": "AXman21", "to": "AXman217"}, {"arrows": "to", "color": "white", "from": "AXman21", "hidden": false, "to": "WasteAXman21"}, {"arrows": "to", "from": "AXman211", "to": "AXman211S", "value": 2}, {"arrows": "to", "from": "AXman211", "to": "AXman2111"}, {"arrows": "to", "from": "AXman211", "to": "AXman2112"}, {"arrows": "to", "from": "AXman211", "to": "AXman2113"}, {"arrows": "to", "color": "white", "from": "AXman211", "hidden": false, "to": "WasteAXman211"}, {"arrows": "to", "from": "AXman22", "to": "AXman22S", "value": 2}, {"arrows": "to", "from": "AXman22", "to": "AXman221"}, {"arrows": "to", "from": "AXman22", "to": "AXman222"}, {"arrows": "to", "from": "AXman22", "to": "AXman223"}, {"arrows": "to", "from": "AXman22", "to": "AXman224"}, {"arrows": "to", "from": "AXman22", "to": "AXman225"}, {"arrows": "to", "from": "AXman22", "to": "AXman226"}, {"arrows": "to", "color": "white", "from": "AXman22", "hidden": false, "to": "WasteAXman22"}, {"arrows": "to", "from": "AXman23", "to": "AXman23S", "value": 2}, {"arrows": "to", "from": "AXman23", "to": "AXman231"}, {"arrows": "to", "from": "AXman23", "to": "AXman232"}, {"arrows": "to", "from": "AXman23", "to": "AXman233"}, {"arrows": "to", "from": "AXman23", "to": "AXman234"}, {"arrows": "to", "color": "white", "from": "AXman23", "hidden": false, "to": "WasteAXman23"}, {"arrows": "to", "from": "AXman3", "to": "AXman3S", "value": 2}, {"arrows": "to", "from": "AXman3", "to": "AXman31"}, {"arrows": "to", "from": "AXman3", "to": "AXman32"}, {"arrows": "to", "from": "AXman3", "to": "AXman33"}, {"arrows": "to", "color": "white", "from": "AXman3", "hidden": false, "to": "WasteAXman3"}, {"arrows": "to", "from": "AXman31", "to": "AXman31S", "value": 2}, {"arrows": "to", "from": "AXman31", "to": "AXman311"}, {"arrows": "to", "from": "AXman31", "to": "AXman312"}, {"arrows": "to", "from": "AXman31", "to": "AXman313"}, {"arrows": "to", "from": "AXman31", "to": "AXman314"}, {"arrows": "to", "from": "AXman31", "to": "AXman315"}, {"arrows": "to", "from": "AXman31", "to": "AXman316"}, {"arrows": "to", "from": "AXman31", "to": "AXman317"}, {"arrows": "to", "from": "AXman31", "to": "AXman318"}, {"arrows": "to", "color": "white", "from": "AXman31", "hidden": false, "to": "WasteAXman31"}, {"arrows": "to", "from": "AXman311", "to": "AXman311S", "value": 2}, {"arrows": "to", "from": "AXman311", "to": "AXman3111"}, {"arrows": "to", "from": "AXman311", "to": "AXman3112"}, {"arrows": "to", "from": "AXman311", "to": "AXman3113"}, {"arrows": "to", "color": "white", "from": "AXman311", "hidden": false, "to": "WasteAXman311"}, {"arrows": "to", "from": "AXman312", "to": "AXman312S", "value": 2}, {"arrows": "to", "from": "AXman312", "to": "AXman3121"}, {"arrows": "to", "from": "AXman312", "to": "AXman3122"}, {"arrows": "to", "color": "white", "from": "AXman312", "hidden": false, "to": "WasteAXman312"}, {"arrows": "to", "from": "AXman313", "to": "AXman313S", "value": 2}, {"arrows": "to", "from": "AXman313", "to": "AXman3131"}, {"arrows": "to", "from": "AXman313", "to": "AXman3132"}, {"arrows": "to", "from": "AXman313", "to": "AXman3133"}, {"arrows": "to", "color": "white", "from": "AXman313", "hidden": false, "to": "WasteAXman313"}, {"arrows": "to", "from": "AXS", "to": "AX", "value": 2}, {"arrows": "to", "from": "AX", "to": "A"}, {"arrows": "to", "from": "AX", "to": "AX2"}, {"arrows": "to", "from": "AX", "to": "AX3"}, {"arrows": "to", "from": "AX", "to": "AX4"}, {"arrows": "to", "from": "AX", "to": "AX5"}, {"arrows": "to", "from": "AX", "to": "AX6"}, {"arrows": "to", "from": "AX", "to": "AX7"}, {"arrows": "to", "color": "white", "from": "AX3", "hidden": false, "to": "Waste1AX3"}, {"arrows": "to", "color": "white", "from": "AX3", "hidden": false, "to": "Waste2AX3"}, {"arrows": "to", "color": "white", "from": "AX3", "hidden": false, "to": "Waste3AX3"}, {"arrows": "to", "color": "white", "from": "AX3", "hidden": false, "to": "Waste4AX3"}, {"arrows": "to", "from": "AX2", "physics": true, "to": "AX2S", "value": 2}, {"arrows": "to", "from": "AX2", "to": "AX21"}, {"arrows": "to", "from": "AX2", "to": "AX22"}, {"arrows": "to", "from": "AX2", "to": "AX23"}, {"arrows": "to", "from": "AX2", "to": "AX24"}, {"arrows": "to", "from": "AX2", "to": "AX25"}, {"arrows": "to", "from": "AX2", "to": "AX26"}, {"arrows": "to", "from": "AX2", "to": "AX27"}, {"arrows": "to", "from": "AX2", "to": "AX28"}, {"arrows": "to", "from": "AX2", "to": "AX29"}, {"arrows": "to", "from": "AX21", "to": "AX21S", "value": 2}, {"arrows": "to", "from": "AX21", "to": "AX211"}, {"arrows": "to", "from": "AX21", "to": "AX212"}, {"arrows": "to", "from": "AX21", "to": "AX213"}, {"arrows": "to", "from": "AX22", "to": "AX22S", "value": 2}, {"arrows": "to", "from": "AX22", "to": "AX221"}, {"arrows": "to", "from": "AX22", "to": "AX222"}, {"arrows": "to", "color": "white", "from": "AX22", "hidden": false, "to": "WasteAX22"}, {"arrows": "to", "from": "AX23", "to": "AX23S", "value": 2}, {"arrows": "to", "from": "AX23", "to": "AX231"}, {"arrows": "to", "from": "AX23", "to": "AX232"}, {"arrows": "to", "from": "AX23", "to": "AX233"}, {"arrows": "to", "from": "AX24", "to": "AX24S", "value": 2}, {"arrows": "to", "from": "AX24", "to": "AX241"}, {"arrows": "to", "from": "AX24", "to": "AX242"}, {"arrows": "to", "color": "white", "from": "AX24", "hidden": false, "to": "WasteAX24"}, {"arrows": "to", "from": "AX25", "to": "AX25S", "value": 2}, {"arrows": "to", "from": "AX25", "to": "AX251"}, {"arrows": "to", "from": "AX25", "to": "AX252"}, {"arrows": "to", "from": "AX25", "to": "AX253"}, {"arrows": "to", "from": "AX26", "to": "AX26S", "value": 2}, {"arrows": "to", "from": "AX26", "to": "AX261"}, {"arrows": "to", "from": "AX26", "to": "AX262"}, {"arrows": "to", "color": "white", "from": "AX26", "hidden": false, "to": "WasteAX26"}, {"arrows": "to", "from": "A", "physics": true, "to": "AS", "value": 2}, {"arrows": "to", "from": "A", "to": "A1"}, {"arrows": "to", "from": "A", "to": "A2"}, {"arrows": "to", "from": "A", "to": "A3"}, {"arrows": "to", "from": "A", "to": "A4"}, {"arrows": "to", "from": "A", "to": "A5"}, {"arrows": "to", "from": "A", "to": "A6"}, {"arrows": "to", "from": "A", "to": "A7"}, {"arrows": "to", "color": "white", "from": "A7", "hidden": false, "to": "Waste1"}, {"arrows": "to", "color": "white", "from": "A7", "hidden": false, "to": "Waste2"}, {"arrows": "to", "color": "white", "from": "A7", "hidden": false, "to": "Waste3"}, {"arrows": "to", "color": "white", "from": "A7", "hidden": false, "to": "Waste4"}, {"arrows": "to", "from": "A2", "to": "A2S", "value": 2}, {"arrows": "to", "from": "A2", "to": "A21"}, {"arrows": "to", "from": "A2", "to": "A22"}, {"arrows": "to", "from": "A2", "to": "A23"}, {"arrows": "to", "from": "C", "to": "A71", "value": 2}, {"arrows": "to", "from": "C", "to": "C1"}, {"arrows": "to", "from": "C", "to": "C2"}, {"arrows": "to", "from": "D", "to": "A31", "value": 2}, {"arrows": "to", "from": "D", "to": "D1"}, {"arrows": "to", "from": "D", "to": "D2"}, {"arrows": "to", "from": "D", "to": "D3"}, {"arrows": "to", "from": "D", "to": "D4"}, {"arrows": "to", "from": "D1", "to": "D1S", "value": 2}, {"arrows": "to", "from": "D1", "to": "D11"}, {"arrows": "to", "from": "D1", "to": "D12"}, {"arrows": "to", "from": "D3S", "to": "D3", "value": 2}, {"arrows": "to", "from": "D4S", "to": "D4", "value": 2}, {"arrows": "to", "from": "D4S", "to": "D41"}, {"arrows": "to", "from": "D4S", "to": "D42"}, {"arrows": "to", "from": "E", "to": "A51", "value": 2}, {"arrows": "to", "from": "E", "to": "E1"}, {"arrows": "to", "from": "E", "to": "E2"}, {"arrows": "to", "from": "E", "to": "E3"}, {"arrows": "to", "from": "E1", "to": "E1S", "value": 2}, {"arrows": "to", "from": "E1", "to": "E11"}, {"arrows": "to", "from": "E1", "to": "E12"}, {"arrows": "to", "from": "E2", "to": "E2S", "value": 2}, {"arrows": "to", "from": "E2", "to": "E21"}, {"arrows": "to", "from": "E2", "to": "E22"}, {"arrows": "to", "from": "E3S", "to": "E3", "value": 2}, {"arrows": "to", "from": "E3S", "to": "E31"}, {"arrows": "to", "from": "E3S", "to": "E32"}, {"arrows": "to", "from": "B", "to": "BS", "value": 2}, {"arrows": "to", "from": "B", "to": "B1"}, {"arrows": "to", "from": "B", "to": "B2"}, {"arrows": "to", "from": "B", "to": "B3"}, {"arrows": "to", "from": "B", "to": "B4"}, {"arrows": "to", "from": "B", "to": "B5"}, {"arrows": "to", "from": "B1", "to": "B1S", "value": 2}, {"arrows": "to", "from": "B1", "to": "B11"}, {"arrows": "to", "from": "B1", "to": "B12"}, {"arrows": "to", "from": "B1", "to": "B13"}, {"arrows": "to", "from": "B11", "to": "B11S", "value": 2}, {"arrows": "to", "from": "B11", "to": "B111"}, {"arrows": "to", "from": "B11", "to": "B112"}, {"arrows": "to", "from": "B12", "to": "B12S", "value": 2}, {"arrows": "to", "from": "B12", "to": "B121"}, {"arrows": "to", "from": "B12", "to": "B122"}, {"arrows": "to", "from": "B12", "to": "B123"}, {"arrows": "to", "from": "B13S", "to": "B13", "value": 2}, {"arrows": "to", "from": "B13", "to": "B131"}, {"arrows": "to", "from": "B13", "to": "B132"}, {"arrows": "to", "from": "B13", "to": "B133"}, {"arrows": "to", "from": "B2", "to": "B2S", "value": 2}, {"arrows": "to", "from": "B2", "to": "B21"}, {"arrows": "to", "from": "B2", "to": "B22"}, {"arrows": "to", "from": "B3", "title": "\u003cdiv class=\u0027section one\u0027 id=\u0027section1\u0027\u003esection 1\u003c/div\u003e", "to": "B3S", "value": 2}, {"arrows": "to", "from": "B3", "to": "B31"}, {"arrows": "to", "from": "B3", "to": "B32"}, {"arrows": "to", "from": "A6", "hidden": true, "physics": false, "to": "B3S"}, {"arrows": "to", "from": "B21", "to": "B21S", "value": 2}, {"arrows": "to", "from": "B21", "to": "B211"}, {"arrows": "to", "from": "B21", "to": "B212"}, {"arrows": "to", "from": "B21", "to": "B213"}, {"arrows": "to", "from": "B22", "to": "B22S", "value": 2}, {"arrows": "to", "from": "B22", "to": "B221"}, {"arrows": "to", "from": "B22", "to": "B222"}, {"arrows": "to", "from": "B22", "to": "B223"}, {"arrows": "to", "from": "XX", "to": "XXS", "value": 2}, {"arrows": "to", "from": "XX", "to": "XX1"}, {"arrows": "to", "from": "XX", "to": "XX2"}, {"arrows": "to", "from": "XX", "to": "XX3"}, {"arrows": "to", "from": "XX", "to": "XX4"}]);
+
+        // adding nodes and edges to the graph
+        data = {nodes: nodes, edges: edges};
+
+        var options = {
+    "configure": {
+        "enabled": false
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "vertical"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "layout": {
+        "hierarchical": {
+            "blockShifting": true,
+            "edgeMinimization": true,
+            "enabled": true,
+            "levelSeparation": 150,
+            "parentCentralization": true,
+            "sortMethod": "hubsize",
+            "treeSpacing": 200
+        },
+        "improvedLayout": true,
+        "randomSeed": 0
+    },
+    "physics": {
+        "barnesHut": {
+            "avoidOverlap": 0,
+            "centralGravity": 0,
+            "damping": 0,
+            "gravitationalConstant": 0,
+            "springConstant": 0,
+            "springLength": 250
+        },
+        "enabled": true,
+        "repulsion": {
+            "centralGravity": 0,
+            "damping": 0,
+            "nodeDistance": 200,
+            "springConstant": 0,
+            "springLength": 200
+        },
+        "solver": "repulsion",
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+        
+        
+
+        
+
+        network = new vis.Network(container, data, options);
+	 
+        
+        // make a custom popup
+        var popup = document.createElement("div");
+        popup.className = 'popup';
+        popupTimeout = null;
+        popup.addEventListener('mouseover', function () {
+            console.log(popup)
+            if (popupTimeout !== null) {
+                clearTimeout(popupTimeout);
+                popupTimeout = null;
+            }
+        });
+        popup.addEventListener('mouseout', function () {
+            if (popupTimeout === null) {
+                hidePopup();
+            }
+        });
+        container.appendChild(popup);
+
+
+        // use the popup event to show
+        network.on("showPopup", function (params) {
+            showPopup(params);
+        });
+
+        // use the hide event to hide it
+        network.on("hidePopup", function (params) {
+            hidePopup();
+        });
+
+
+        // hiding the popup through css
+        function hidePopup() {
+            popupTimeout = setTimeout(function () { popup.style.display = 'none'; }, 500);
+        }
+
+        // showing the popup
+        function showPopup(nodeId) {
+
+            // get the data from the vis.DataSet
+            var nodeData = nodes.get(nodeId);
+            // get the position of the node
+            var posCanvas = network.getPositions([nodeId])[nodeId];
+
+            if (!nodeData) {
+                var edgeData = edges.get(nodeId);
+                var poses = network.getPositions([edgeData.from, edgeData.to]);
+                var middle_x = (poses[edgeData.to].x - poses[edgeData.from].x) * 0.5;
+                var middle_y = (poses[edgeData.to].y - poses[edgeData.from].y) * 0.5;
+                posCanvas = poses[edgeData.from];
+                posCanvas.x = posCanvas.x + middle_x;
+                posCanvas.y = posCanvas.y + middle_y;
+
+                popup.innerHTML = edgeData.title;
+            } else {
+                popup.innerHTML = nodeData.title;
+                // get the bounding box of the node
+                var boundingBox = network.getBoundingBox(nodeId);
+                posCanvas.x = posCanvas.x + 0.5 * (boundingBox.right - boundingBox.left);
+                posCanvas.y = posCanvas.y + 0.5 * (boundingBox.top - boundingBox.bottom);
+            };
+
+            // convert coordinates to the DOM space
+            var posDOM = network.canvasToDOM(posCanvas);
+
+            // Give it an offset
+            posDOM.x += 10;
+            posDOM.y -= 20;
+
+            // show and place the tooltip.
+            popup.style.display = 'block';
+            popup.style.top = posDOM.y + 'px';
+            popup.style.left = posDOM.x + 'px';
+        }
+        
+
+
+        
+        network.on("stabilizationProgress", function(params) {
+      		document.getElementById('loadingBar').removeAttribute("style");
+	        var maxWidth = 496;
+	        var minWidth = 20;
+	        var widthFactor = params.iterations/params.total;
+	        var width = Math.max(minWidth,maxWidth * widthFactor);
+
+	        document.getElementById('bar').style.width = width + 'px';
+	        document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+	    });
+	    network.once("stabilizationIterationsDone", function() {
+	        document.getElementById('text').innerHTML = '100%';
+	        document.getElementById('bar').style.width = '496px';
+	        document.getElementById('loadingBar').style.opacity = 0;
+	        // really clean the dom element
+	        setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+	    });
+        
+
+        return network;
+
+    }
+
+    drawGraph();
+
+</script>
+</body>
+</html>
